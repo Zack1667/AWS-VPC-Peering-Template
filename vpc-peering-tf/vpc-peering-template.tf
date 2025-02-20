@@ -71,24 +71,66 @@ resource "aws_route" "prod_to_dev_route" {
   vpc_peering_connection_id   = aws_vpc_peering_connection.peer_dev_to_prod.id
 }
 
-# Security Group Rules for Dev VPC (Allowing SSH/RDP from Prod VPC)
-resource "aws_security_group_rule" "dev_allow_ssh_rdp" {
-  provider                = aws.account1
-  security_group_id       = "sg-xxxxxxxxxxxxxxxxx" # Replace with Dev SG ID
-  type                    = "ingress"
-  from_port               = 22
-  to_port                 = 3389
-  protocol                = "tcp"
-  cidr_blocks             = ["10.222.2.0/24"] # Allow traffic from Prod VPC
+# Create Security Group in Dev VPC (Account1) - Allow SSH & RDP from Prod VPC
+resource "aws_security_group" "dev_allow_ssh_rdp" {
+  provider = aws.account1
+  name     = "dev-allow-ssh-rdp"
+  vpc_id   = var.dev_vpc_id
+
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["10.222.2.0/24"] # Allow SSH from Prod VPC
+  }
+
+  ingress {
+    from_port   = 3389
+    to_port     = 3389
+    protocol    = "tcp"
+    cidr_blocks = ["10.222.2.0/24"] # Allow RDP from Prod VPC
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"] # Allow all outbound traffic
+  }
+
+  tags = {
+    Name = "dev-allow-ssh-rdp"
+  }
 }
 
-# Security Group Rules for Prod VPC (Allowing SSH/RDP from Dev VPC)
-resource "aws_security_group_rule" "prod_allow_ssh_rdp" {
-  provider                = aws.account2
-  security_group_id       = "sg-yyyyyyyyyyyyyyyyy" # Replace with Prod SG ID
-  type                    = "ingress"
-  from_port               = 22
-  to_port                 = 3389
-  protocol                = "tcp"
-  cidr_blocks             = ["10.200.241.0/24"] # Allow traffic from Dev VPC
+# Create Security Group in Prod VPC (Account2) - Allow SSH & RDP from Dev VPC
+resource "aws_security_group" "prod_allow_ssh_rdp" {
+  provider = aws.account2
+  name     = "prod-allow-ssh-rdp"
+  vpc_id   = var.prod_vpc_id
+
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["10.200.241.0/24"] # Allow SSH from Dev VPC
+  }
+
+  ingress {
+    from_port   = 3389
+    to_port     = 3389
+    protocol    = "tcp"
+    cidr_blocks = ["10.200.241.0/24"] # Allow RDP from Dev VPC
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"] # Allow all outbound traffic
+  }
+
+  tags = {
+    Name = "prod-allow-ssh-rdp"
+  }
 }
