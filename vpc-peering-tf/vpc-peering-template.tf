@@ -14,13 +14,13 @@ provider "aws" {
 module "dev_vpc" {
   source  = "terraform-aws-modules/vpc/aws"
   providers = { aws = aws.account1 }
-  name    = "dev-vpc"
-  cidr    = "10.200.241.0/24"
+  name    = "dev-vpc" # Update accordingly
+  cidr    = "10.200.241.0/24" # Update with your CIDR values
   enable_dns_hostnames = true
   enable_dns_support   = true
   
   tags = {
-    Environment = "dev"
+    Environment = "dev" # Update accordingly
   }
 }
 
@@ -28,13 +28,13 @@ module "dev_vpc" {
 module "prod_vpc" {
   source  = "terraform-aws-modules/vpc/aws"
   providers = { aws = aws.account2 }
-  name    = "prod-vpc"
-  cidr    = "10.222.2.0/24"
+  name    = "prod-vpc" # Update accordingly
+  cidr    = "10.222.2.0/24" # Update with your CIDR values
   enable_dns_hostnames = true
   enable_dns_support   = true
   
   tags = {
-    Environment = "prod"
+    Environment = "prod" # Update accordingly
   }
 }
 
@@ -58,7 +58,7 @@ resource "aws_vpc_peering_connection_accepter" "accept_peer_dev_to_prod" {
 resource "aws_route" "dev_to_prod_route" {
   provider = aws.account1
   route_table_id         = module.dev_vpc.private_route_table_ids[0]
-  destination_cidr_block = "10.222.2.0/24"
+  destination_cidr_block = "10.222.2.0/24" # Update with your CIDR values
   vpc_peering_connection_id = aws_vpc_peering_connection.peer_dev_to_prod.id
 }
 
@@ -66,7 +66,7 @@ resource "aws_route" "dev_to_prod_route" {
 resource "aws_route" "prod_to_dev_route" {
   provider = aws.account2
   route_table_id         = module.prod_vpc.private_route_table_ids[0]
-  destination_cidr_block = "10.200.241.0/24"
+  destination_cidr_block = "10.200.241.0/24" # Update with your CIDR values
   vpc_peering_connection_id = aws_vpc_peering_connection.peer_dev_to_prod.id
 }
 
@@ -79,14 +79,14 @@ resource "aws_security_group" "dev_allow_ssh_rdp" {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = ["10.222.2.0/24"]
+    cidr_blocks = ["10.222.2.0/24"] # Update with your CIDR values
   }
 
   ingress {
     from_port   = 3389
     to_port     = 3389
     protocol    = "tcp"
-    cidr_blocks = ["10.222.2.0/24"]
+    cidr_blocks = ["10.222.2.0/24"] # Update with your CIDR values
   }
 }
 
@@ -99,13 +99,13 @@ resource "aws_security_group" "prod_allow_ssh_rdp" {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = ["10.200.241.0/24"]
+    cidr_blocks = ["10.200.241.0/24"] # Update with your CIDR values
   }
 
   ingress {
     from_port   = 3389
     to_port     = 3389
     protocol    = "tcp"
-    cidr_blocks = ["10.200.241.0/24"]
-  }
+    cidr_blocks = ["10.200.241.0/24"] # Update with your CIDR values
+  } 
 }
