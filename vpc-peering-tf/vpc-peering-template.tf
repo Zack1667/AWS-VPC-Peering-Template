@@ -57,7 +57,7 @@ resource "aws_vpc_peering_connection_accepter" "accept_peer_dev_to_prod" {
 # Route Table Updates in Account1 (Dev VPC)
 resource "aws_route" "dev_to_prod_route" {
   provider = aws.account1
-  route_table_id         = module.dev_vpc.private_route_table_ids[0]
+  route_table_id         = "rtb-xxxx" # Replace with your route table id
   destination_cidr_block = "10.222.2.0/24" # Update with your CIDR values
   vpc_peering_connection_id = aws_vpc_peering_connection.peer_dev_to_prod.id
 }
@@ -65,7 +65,7 @@ resource "aws_route" "dev_to_prod_route" {
 # Route Table Updates in Account2 (Prod VPC)
 resource "aws_route" "prod_to_dev_route" {
   provider = aws.account2
-  route_table_id         = module.prod_vpc.private_route_table_ids[0]
+  route_table_id         = "rtb-xxxx" # Replace with your route table id
   destination_cidr_block = "10.200.241.0/24" # Update with your CIDR values
   vpc_peering_connection_id = aws_vpc_peering_connection.peer_dev_to_prod.id
 }
